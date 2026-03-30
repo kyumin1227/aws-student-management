@@ -1,0 +1,16 @@
+# Terraform 상태 파일
+*.tfstate
+*.tfstate.backup
+
+# 실제 변수값
+*.tfvars
+*.tfvars.json
+
+# Terraform 내부 디렉토리
+.terraform/
+
+# Lambda 빌드 산출물
+lambda/*.zip
+
+# macOS
+.DS_Store

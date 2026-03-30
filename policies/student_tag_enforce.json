@@ -1,0 +1,114 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyRunInstancesWithoutOwnerTag",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestTag/Owner": "${aws:username}"
+        }
+      }
+    },
+    {
+      "Sid": "DenyCreateResourcesWithoutOwnerTag",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:CreateVolume",
+        "ec2:CreateSnapshot",
+        "s3:CreateBucket",
+        "rds:CreateDBInstance",
+        "rds:CreateDBCluster"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestTag/Owner": "${aws:username}"
+        }
+      }
+    },
+    {
+      "Sid": "DenyDeleteOwnerTag",
+      "Effect": "Deny",
+      "Action": "ec2:DeleteTags",
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringEquals": {
+          "aws:TagKeys": ["Owner"]
+        }
+      }
+    },
+    {
+      "Sid": "DenyModifyOwnerTagAfterCreate",
+      "Effect": "Deny",
+      "Action": "ec2:CreateTags",
+      "Resource": "*",
+      "Condition": {
+        "ForAnyValue:StringEquals": {
+          "aws:TagKeys": ["Owner"]
+        },
+        "StringNotEquals": {
+          "ec2:CreateAction": "RunInstances"
+        }
+      }
+    },
+    {
+      "Sid": "DenyS3TagModification",
+      "Effect": "Deny",
+      "Action": [
+        "s3:DeleteBucketTagging",
+        "s3:PutBucketTagging"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:ResourceTag/Owner": "${aws:username}"
+        }
+      }
+    },
+    {
+      "Sid": "DenyNatGateway",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:CreateNatGateway"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyExpensiveServices",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:RequestSpotInstances",
+        "ec2:RequestSpotFleet",
+        "ec2:CreateSpotDatafeedSubscription",
+        "elasticache:CreateCacheCluster",
+        "elasticache:CreateReplicationGroup",
+        "redshift:CreateCluster",
+        "redshift:RestoreFromClusterSnapshot",
+        "eks:CreateCluster",
+        "emr:RunJobFlow"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyExpensiveInstanceTypes",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringLike": {
+          "ec2:InstanceType": [
+            "p2.*", "p3.*", "p4d.*", "p5.*",
+            "g3.*", "g4dn.*", "g4ad.*", "g5.*", "g5g.*",
+            "x1.*", "x2.*",
+            "u-*",
+            "trn1.*",
+            "inf1.*", "inf2.*"
+          ]
+        }
+      }
+    }
+  ]
+}
