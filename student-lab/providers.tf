@@ -8,14 +8,14 @@ terraform {
     }
   }
 
-  # 권장: 원격 상태 관리 (S3 백엔드 + DynamoDB 잠금)
-  # backend "s3" {
-  #   bucket         = "your-tfstate-bucket"
-  #   key            = "student-lab/terraform.tfstate"
-  #   region         = "ap-northeast-2"
-  #   dynamodb_table = "terraform-state-lock"
-  #   encrypt        = true
-  # }
+  cloud { 
+    
+    organization = "gsc-slack-app" 
+
+    workspaces { 
+      name = "aws-student-lab-test" 
+    } 
+  }
 }
 
 provider "aws" {
