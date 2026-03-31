@@ -91,7 +91,7 @@ resource "aws_iam_role_policy" "lambda_kill_switch" {
         Action = [
           "s3:ListAllMyBuckets",
           "s3:GetBucketTagging",
-          "s3:PutPublicAccessBlock",
+          "s3:PutBucketPublicAccessBlock",
           "s3:PutBucketPolicy",
           "s3:GetBucketPolicy"
         ]
