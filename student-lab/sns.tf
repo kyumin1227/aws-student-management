@@ -1,7 +1,6 @@
 # 50%, 80% 알림용 토픽 (강사 이메일만 구독)
 resource "aws_sns_topic" "budget_warning" {
-  name              = "student-budget-warning"
-  kms_master_key_id = "alias/aws/sns"
+  name = "student-budget-warning"
 
   tags = {
     Name = "student-budget-warning"
@@ -38,8 +37,7 @@ resource "aws_sns_topic_subscription" "warning_email" {
 
 # 100% 알림용 토픽 (Lambda 킬 스위치 + 강사 이메일 구독)
 resource "aws_sns_topic" "budget_kill" {
-  name              = "student-budget-kill"
-  kms_master_key_id = "alias/aws/sns"
+  name = "student-budget-kill"
 
   tags = {
     Name = "student-budget-kill"
