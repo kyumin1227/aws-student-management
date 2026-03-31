@@ -57,10 +57,7 @@
     {
       "Sid": "DenyS3TagModification",
       "Effect": "Deny",
-      "Action": [
-        "s3:DeleteBucketTagging",
-        "s3:PutBucketTagging"
-      ],
+      "Action": ["s3:DeleteBucketTagging", "s3:PutBucketTagging"],
       "Resource": "*",
       "Condition": {
         "StringNotEquals": {
@@ -71,9 +68,7 @@
     {
       "Sid": "DenyNatGateway",
       "Effect": "Deny",
-      "Action": [
-        "ec2:CreateNatGateway"
-      ],
+      "Action": ["ec2:CreateNatGateway"],
       "Resource": "*"
     },
     {
@@ -100,13 +95,60 @@
       "Condition": {
         "StringLike": {
           "ec2:InstanceType": [
-            "p2.*", "p3.*", "p4d.*", "p5.*",
-            "g3.*", "g4dn.*", "g4ad.*", "g5.*", "g5g.*",
-            "x1.*", "x2.*",
+            "p2.*",
+            "p3.*",
+            "p4d.*",
+            "p5.*",
+            "g3.*",
+            "g4dn.*",
+            "g4ad.*",
+            "g5.*",
+            "g5g.*",
+            "x1.*",
+            "x2.*",
             "u-*",
             "trn1.*",
-            "inf1.*", "inf2.*"
+            "inf1.*",
+            "inf2.*"
           ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyActionsOnOthersResources",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:StopInstances",
+        "ec2:TerminateInstances",
+        "ec2:RebootInstances",
+        "ec2:ModifyInstanceAttribute",
+        "ec2:AttachVolume",
+        "ec2:DetachVolume",
+        "ec2:DeleteVolume",
+        "rds:Delete*",
+        "rds:Modify*",
+        "rds:Stop*",
+        "s3:DeleteObject",
+        "s3:PutObject"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:ResourceTag/Owner": "${aws:username}"
+        },
+        "Null": {
+          "aws:ResourceTag/Owner": "false"
+        }
+      }
+    },
+    {
+      "Sid": "DenyS3ActionsOnOthersBuckets",
+      "Effect": "Deny",
+      "Action": ["s3:PutObject", "s3:DeleteObject", "s3:GetObject"],
+      "Resource": "arn:aws:s3:::*/*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:ResourceTag/Owner": "${aws:username}"
         }
       }
     }
