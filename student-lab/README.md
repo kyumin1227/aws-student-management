@@ -15,6 +15,8 @@ Terraform으로 학생별 AWS 실습 환경을 일괄 프로비저닝하고, 예
 | SNS Topic  | `student-budget-kill`              | 100% 초과 시 관리자 이메일 알림 및 Lambda 킬 스위치 트리거 |
 | Lambda     | `student-budget-kill-switch`       | EC2 중지, EIP 해제, S3 차단, RDS 중지                      |
 | SQS        | `student-kill-switch-dlq`          | Lambda 실패 메시지 보관                                    |
+| CloudTrail | `student-lab-trail`                | 전체 API 호출 기록 (Management Events)                     |
+| S3 Bucket  | `student-lab-cloudtrail-{account}` | CloudTrail 로그 저장                                       |
 
 ---
 
