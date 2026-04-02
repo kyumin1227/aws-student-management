@@ -15,13 +15,7 @@
     {
       "Sid": "DenyCreateResourcesWithoutOwnerTag",
       "Effect": "Deny",
-      "Action": [
-        "ec2:CreateVolume",
-        "ec2:CreateSnapshot",
-        "s3:CreateBucket",
-        "rds:CreateDBInstance",
-        "rds:CreateDBCluster"
-      ],
+      "Action": ["ec2:CreateVolume", "ec2:CreateSnapshot", "rds:CreateDBInstance", "rds:CreateDBCluster"],
       "Resource": "*",
       "Condition": {
         "StringNotEquals": {
@@ -151,6 +145,23 @@
           "aws:ResourceTag/Owner": "${aws:username}"
         }
       }
+    },
+    {
+      "Sid": "EnforceOwnerTagOnCreate",
+      "Effect": "Deny",
+      "Action": "s3:CreateBucket",
+      "Resource": "arn:aws:s3:::*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestTag/Owner": "${aws:username}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowCreateWithTag",
+      "Effect": "Allow",
+      "Action": "s3:CreateBucket",
+      "Resource": "arn:aws:s3:::*"
     }
   ]
 }
