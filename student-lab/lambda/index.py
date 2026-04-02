@@ -287,19 +287,32 @@ def notify_student(
 
 # ─── Lambda 핸들러 ─────────────────────────────────────────────────────────────
 
+def get_student_name_from_plain_text(text: str) -> str | None:
+    """
+    AWS Budgets 평문 알림에서 학생 이름 추출.
+    예: "Budget Name: student-alice-monthly-budget" → "alice"
+    """
+    for line in text.splitlines():
+        if line.strip().startswith("Budget Name:"):
+            budget_name = line.split(":", 1)[1].strip()
+            return get_student_name_from_budget_notification({"budgetName": budget_name})
+    return None
+
+
 def lambda_handler(event: dict, context) -> dict:
     for record in event.get("Records", []):
         sns_message_raw = record.get("Sns", {}).get("Message", "{}")
 
         try:
             sns_message = json.loads(sns_message_raw)
+            student_name = get_student_name_from_budget_notification(sns_message)
         except json.JSONDecodeError:
-            logger.error(f"SNS 메시지 파싱 실패: {sns_message_raw}")
-            continue
+            # AWS Budgets가 평문 텍스트로 메시지를 보내는 경우
+            logger.info("JSON 파싱 실패 — 평문 포맷으로 재시도")
+            student_name = get_student_name_from_plain_text(sns_message_raw)
 
-        student_name = get_student_name_from_budget_notification(sns_message)
         if not student_name:
-            logger.warning(f"학생 이름 추출 실패: {sns_message}")
+            logger.warning(f"학생 이름 추출 실패: {sns_message_raw}")
             continue
 
         logger.info(f"킬 스위치 실행 — 학생: {student_name}")
