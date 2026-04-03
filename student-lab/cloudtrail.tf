@@ -9,7 +9,8 @@ resource "aws_s3_bucket" "cloudtrail" {
   force_destroy = true
 
   tags = {
-    Name = "student-lab-cloudtrail"
+    Name  = "student-lab-cloudtrail"
+    Owner = local.caller_name
   }
 }
 
@@ -65,7 +66,8 @@ resource "aws_cloudtrail" "student_lab" {
   enable_log_file_validation    = true
 
   tags = {
-    Name = "student-lab-trail"
+    Name  = "student-lab-trail"
+    Owner = local.caller_name
   }
 
   depends_on = [aws_s3_bucket_policy.cloudtrail]

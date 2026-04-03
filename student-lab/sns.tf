@@ -3,7 +3,8 @@ resource "aws_sns_topic" "budget_warning" {
   name = "student-budget-warning"
 
   tags = {
-    Name = "student-budget-warning"
+    Name  = "student-budget-warning"
+    Owner = local.caller_name
   }
 }
 
@@ -40,7 +41,8 @@ resource "aws_sns_topic" "budget_kill" {
   name = "student-budget-kill"
 
   tags = {
-    Name = "student-budget-kill"
+    Name  = "student-budget-kill"
+    Owner = local.caller_name
   }
 }
 
@@ -84,7 +86,8 @@ resource "aws_sns_topic" "config_alert" {
   name = "student-lab-config-alert"
 
   tags = {
-    Name = "student-lab-config-alert"
+    Name  = "student-lab-config-alert"
+    Owner = local.caller_name
   }
 }
 
