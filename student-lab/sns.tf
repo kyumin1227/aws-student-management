@@ -78,3 +78,40 @@ resource "aws_sns_topic_subscription" "kill_email" {
   protocol  = "email"
   endpoint  = var.lab_admin_email
 }
+
+# Owner 태그 누락 감지 알림 토픽 (AWS Config → EventBridge → SNS)
+resource "aws_sns_topic" "config_alert" {
+  name = "student-lab-config-alert"
+
+  tags = {
+    Name = "student-lab-config-alert"
+  }
+}
+
+resource "aws_sns_topic_policy" "config_alert" {
+  arn = aws_sns_topic.config_alert.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "AllowEventBridgeToPublish"
+      Effect    = "Allow"
+      Principal = { Service = "events.amazonaws.com" }
+      Action    = "SNS:Publish"
+      Resource  = aws_sns_topic.config_alert.arn
+      Condition = {
+        StringEquals = {
+          "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_sns_topic_subscription" "config_alert_email" {
+  count = var.lab_admin_email != "" ? 1 : 0
+
+  topic_arn = aws_sns_topic.config_alert.arn
+  protocol  = "email"
+  endpoint  = var.lab_admin_email
+}
