@@ -8,13 +8,10 @@ terraform {
     }
   }
 
-  cloud { 
-    
-    organization = "gsc-slack-app" 
-
-    workspaces { 
-      name = "aws-student-lab-test" 
-    } 
+  backend "s3" {
+    key     = "student-lab/terraform.tfstate"
+    region  = "ap-northeast-2"
+    encrypt = true
   }
 }
 

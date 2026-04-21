@@ -34,8 +34,8 @@ resource "aws_iam_role_policy" "config_s3" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = ["s3:GetBucketAcl", "s3:ListBucket"]
+        Effect   = "Allow"
+        Action   = ["s3:GetBucketAcl", "s3:ListBucket"]
         Resource = aws_s3_bucket.cloudtrail.arn
       },
       {
@@ -147,10 +147,10 @@ resource "aws_cloudwatch_event_target" "config_noncompliant_sns" {
 
   input_transformer {
     input_paths = {
-      resource    = "$.detail.resourceId"
-      type        = "$.detail.resourceType"
-      rule        = "$.detail.configRuleName"
-      time        = "$.time"
+      resource = "$.detail.resourceId"
+      type     = "$.detail.resourceType"
+      rule     = "$.detail.configRuleName"
+      time     = "$.time"
     }
     input_template = "\"[AWS Lab] Owner 태그 누락 감지\\n리소스 타입: <type>\\n리소스 ID: <resource>\\n감지 시각: <time>\\n\\n해당 학생에게 Owner 태그 추가를 안내하세요.\""
   }

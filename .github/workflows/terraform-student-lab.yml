@@ -1,0 +1,67 @@
+name: Terraform Student Lab
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "student-lab/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "student-lab/**"
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: "destroy 실행 여부 (yes 입력 시 terraform destroy 실행)"
+        required: false
+        default: "no"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: student-lab
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: ap-northeast-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.5"
+
+      - name: Terraform Init
+        run: terraform init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}"
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file="terraform.tfvars" -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply tfplan
+
+      - name: Terraform Destroy
+        if: github.event.inputs.destroy == 'yes'
+        run: terraform destroy -var-file="terraform.tfvars" -auto-approve

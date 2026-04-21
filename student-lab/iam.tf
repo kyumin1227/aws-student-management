@@ -9,7 +9,7 @@ resource "aws_iam_policy" "student_tag_enforce" {
 resource "aws_iam_user" "student" {
   for_each = toset(var.students)
 
-  name = each.key   # "alice", "bob" 등 — aws:username == Owner 태그 값과 일치
+  name = each.key # "alice", "bob" 등 — aws:username == Owner 태그 값과 일치
   path = "/students/"
 
   tags = {
@@ -65,8 +65,8 @@ output "student_console_credentials" {
     sign_in_url = "https://${data.aws_caller_identity.current.account_id}.signin.aws.amazon.com/console"
     students = {
       for name in var.students : name => {
-        username         = aws_iam_user.student[name].name
-        temp_password    = aws_iam_user_login_profile.student[name].password
+        username      = aws_iam_user.student[name].name
+        temp_password = aws_iam_user_login_profile.student[name].password
       }
     }
   }

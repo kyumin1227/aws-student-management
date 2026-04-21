@@ -12,9 +12,9 @@ data "archive_file" "kill_switch" {
 # ─── Dead Letter Queue ─────────────────────────────────────────────────────────
 
 resource "aws_sqs_queue" "lambda_dlq" {
-  name                       = "student-kill-switch-dlq"
-  message_retention_seconds  = 1209600 # 14일
-  kms_master_key_id          = "alias/aws/sqs"
+  name                      = "student-kill-switch-dlq"
+  message_retention_seconds = 1209600 # 14일
+  kms_master_key_id         = "alias/aws/sqs"
 
   tags = {
     Name = "student-kill-switch-dlq"
@@ -143,8 +143,8 @@ resource "aws_lambda_function" "kill_switch" {
   environment {
     variables = {
       # TODO 2: 학생 이메일 맵 (JSON 직렬화)
-      STUDENT_EMAILS  = jsonencode(var.student_emails)
-      SES_SENDER      = var.ses_sender_email
+      STUDENT_EMAILS = jsonencode(var.student_emails)
+      SES_SENDER     = var.ses_sender_email
     }
   }
 
