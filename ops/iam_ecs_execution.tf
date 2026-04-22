@@ -33,6 +33,25 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_managed" {
 # Secrets Manager 접근 — Task Definition secrets 필드를 통한 환경 변수 자동 주입
 # (예: DB_PASSWORD, SLACK_BOT_TOKEN, GOOGLE_CALENDAR_CREDENTIALS)
 # account_id 명시로 타계정 secret 접근 방지
+resource "aws_iam_role_policy" "ecs_execution_logs" {
+  name = "cloudwatch-logs"
+  role = aws_iam_role.ecs_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "CloudWatchLogsCreateGroup"
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+      ]
+      Resource = "arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/${var.app_name}*"
+    }]
+  })
+}
+
 resource "aws_iam_role_policy" "ecs_execution_secrets" {
   name = "secrets-injection"
   role = aws_iam_role.ecs_execution.id

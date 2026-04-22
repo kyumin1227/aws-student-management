@@ -61,15 +61,13 @@ resource "aws_iam_role_policy" "github_passrole" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Sid      = "DenyPassRoleToNonECS"
-      Effect   = "Deny"
-      Action   = "iam:PassRole"
-      Resource = "*"
-      Condition = {
-        StringNotEquals = {
-          "iam:PassedToService" = "ecs-tasks.amazonaws.com"
-        }
-      }
+      Sid    = "AllowPassRoleToECSOnly"
+      Effect = "Allow"
+      Action = "iam:PassRole"
+      Resource = [
+        aws_iam_role.ecs_task.arn,
+        aws_iam_role.ecs_execution.arn,
+      ]
     }]
   })
 }
