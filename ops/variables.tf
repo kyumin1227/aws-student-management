@@ -9,12 +9,10 @@ variable "aws_region" {
   default     = "ap-northeast-2"
 }
 
-variable "github_org" {
-  description = "GitHub 조직 또는 사용자명 (OIDC 신뢰 관계에 사용, 예: my-github-org)"
-  type        = string
-}
-
-variable "github_repo" {
-  description = "앱 코드 GitHub 리포지토리 이름 (이 관리 레포가 아닌 슬랙 앱 레포, 예: slack-app)"
-  type        = string
+variable "github_repos" {
+  description = "GitHub Actions OIDC 신뢰 관계를 허용할 레포 목록 (예: [{org=\"myorg\", repo=\"my-app\"}])"
+  type = list(object({
+    org  = string
+    repo = string
+  }))
 }

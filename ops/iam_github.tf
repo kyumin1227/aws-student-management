@@ -13,7 +13,7 @@
 
 resource "aws_iam_role" "github_actions" {
   name        = "${var.app_name}-github-actions-role"
-  description = "GitHub Actions OIDC deploy role for ${var.github_org}/${var.github_repo}"
+  description = "GitHub Actions OIDC deploy role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -28,10 +28,10 @@ resource "aws_iam_role" "github_actions" {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
         }
         StringLike = {
-          # :* 는 모든 브랜치/태그/PR/환경 허용 — 학과 내부 앱이므로 의도적 선택.
-          # main 브랜치로만 제한하려면:
-          #   "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/main"
-          "token.actions.githubusercontent.com:sub" = "repo:${var.github_org}/${var.github_repo}:*"
+          # 등록된 모든 레포에서 OIDC 인증 허용
+          "token.actions.githubusercontent.com:sub" = [
+            for r in var.github_repos : "repo:${r.org}/${r.repo}:*"
+          ]
         }
       }
     }]
