@@ -5,27 +5,20 @@ variable "aws_region" {
 }
 
 variable "students" {
-  description = "학생 이름 목록 (IAM username 및 Owner 태그 값으로 사용)."
-  type        = list(string)
+  description = "학생 목록. username은 Identity Center 로그인 ID 및 Owner 태그 값으로 사용"
+  type = list(object({
+    username    = string
+    given_name  = string
+    family_name = string
+    email       = optional(string, "")
+    budget      = optional(number, null)
+  }))
 }
 
 variable "budget_limit_usd" {
-  description = "학생 1인당 월 예산 기본값 (USD). student_budget_limits로 개별 재정의 가능"
+  description = "학생 1인당 월 예산 기본값 (USD). students[].budget으로 개별 재정의 가능"
   type        = number
   default     = 40
-}
-
-variable "student_budget_limits" {
-  description = "학생별 개별 예산 한도 (USD). 명시된 학생만 기본값에서 재정의됨"
-  type        = map(number)
-  default     = {}
-}
-
-# TODO 2: 킬 스위치 발동 시 학생 이메일 알림
-variable "student_emails" {
-  description = "학생별 이메일 주소 맵 (킬 스위치 발동 시 알림용). 비워두면 알림 비활성화"
-  type        = map(string)
-  default     = {}
 }
 
 variable "ses_sender_email" {

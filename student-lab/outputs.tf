@@ -1,9 +1,11 @@
-output "iam_user_arns" {
-  description = "학생별 IAM 사용자 ARN"
-  value = {
-    for name, user in aws_iam_user.student :
-    name => user.arn
-  }
+output "sso_portal_url" {
+  description = "학생 SSO 로그인 포털 URL"
+  value       = "https://d-${local.sso_identity_store_id}.awsapps.com/start"
+}
+
+output "student_usernames" {
+  description = "학생별 Identity Center 사용자명"
+  value       = { for s in var.students : s.username => aws_identitystore_user.student[s.username].user_name }
 }
 
 output "sns_warning_topic_arn" {

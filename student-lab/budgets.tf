@@ -1,9 +1,9 @@
 resource "aws_budgets_budget" "student" {
-  for_each = toset(var.students)
+  for_each = { for s in var.students : s.username => s }
 
-  name         = "student-${each.key}-monthly-budget"
+  name         = "student-${each.value.username}-monthly-budget"
   budget_type  = "COST"
-  limit_amount = tostring(lookup(var.student_budget_limits, each.key, var.budget_limit_usd))
+  limit_amount = tostring(each.value.budget != null ? each.value.budget : var.budget_limit_usd)
   limit_unit   = "USD"
   time_unit    = "MONTHLY"
 
@@ -13,7 +13,7 @@ resource "aws_budgets_budget" "student" {
   # 전제조건: AWS Cost Explorer에서 "Owner" 태그를 Cost Allocation Tag로 활성화해야 함
   cost_filter {
     name   = "TagKeyValue"
-    values = [format("user:Owner$%s", each.key)]
+    values = [format("user:Owner$%s", each.value.username)]
   }
 
   # 50% — 경보 토픽 (강사 이메일)

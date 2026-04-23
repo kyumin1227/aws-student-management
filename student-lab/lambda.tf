@@ -143,7 +143,7 @@ resource "aws_lambda_function" "kill_switch" {
   environment {
     variables = {
       # TODO 2: 학생 이메일 맵 (JSON 직렬화)
-      STUDENT_EMAILS = jsonencode(var.student_emails)
+      STUDENT_EMAILS = jsonencode({ for s in var.students : s.username => s.email if s.email != "" })
       SES_SENDER     = var.ses_sender_email
     }
   }
