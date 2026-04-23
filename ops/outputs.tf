@@ -20,3 +20,13 @@ output "account_id" {
   description = "현재 AWS 계정 ID"
   value       = data.aws_caller_identity.current.account_id
 }
+
+output "acm_certificate_arn" {
+  description = "와일드카드 인증서 ARN — ALB HTTPS 리스너에 설정"
+  value       = aws_acm_certificate_validation.main.certificate_arn
+}
+
+output "route53_zone_id" {
+  description = "gsc-lab.io 호스팅 존 ID — 서브도메인 레코드 추가 시 참조"
+  value       = data.aws_route53_zone.main.zone_id
+}
