@@ -12,7 +12,7 @@
 #    서비스가 안정화되면 필요한 Action만 열거하는 최소 권한 정책으로 교체 권장.
 
 resource "aws_iam_role" "github_actions" {
-  name        = "${var.app_name}-github-actions-role"
+  name        = "github-actions-deploy-role"
   description = "GitHub Actions OIDC deploy role"
 
   assume_role_policy = jsonencode({
@@ -64,10 +64,10 @@ resource "aws_iam_role_policy" "github_passrole" {
       Sid    = "AllowPassRoleToECSOnly"
       Effect = "Allow"
       Action = "iam:PassRole"
-      Resource = [
-        aws_iam_role.ecs_task.arn,
-        aws_iam_role.ecs_execution.arn,
-      ]
+      Resource = concat(
+        [for r in aws_iam_role.ecs_task : r.arn],
+        [for r in aws_iam_role.ecs_execution : r.arn],
+      )
     }]
   })
 }

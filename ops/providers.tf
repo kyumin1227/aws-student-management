@@ -9,9 +9,10 @@ terraform {
   }
 
   backend "s3" {
-    key     = "ops/terraform.tfstate"
-    region  = "ap-northeast-2"
-    encrypt = true
+    key            = "ops/terraform.tfstate"
+    region         = "ap-northeast-2"
+    dynamodb_table = "terraform-lock"
+    encrypt        = true
   }
 }
 
