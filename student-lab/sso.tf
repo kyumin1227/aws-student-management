@@ -2,15 +2,27 @@
 #
 # 사전 준비 (콘솔에서 1회 수동 설정):
 #   1. IAM Identity Center 활성화
-#   2. Settings → Attributes for access control → 속성 추가:
-#      Key: userName  /  Value: ${user:userName}
-#      → 로그인 시 aws:PrincipalTag/userName 으로 사용자명이 전달됨
+#
+# ABAC 속성 매핑: aws_ssoadmin_instance_access_control_attributes 리소스로 자동 설정
+#   built-in identity store는 ${user:userName} 미지원 → display_name을 username으로 설정하고
+#   ${user:name} 을 사용하여 aws:PrincipalTag/userName 에 username 값이 전달됨
 
 data "aws_ssoadmin_instances" "this" {}
 
 locals {
   sso_instance_arn      = tolist(data.aws_ssoadmin_instances.this.arns)[0]
   sso_identity_store_id = tolist(data.aws_ssoadmin_instances.this.identity_store_ids)[0]
+}
+
+resource "aws_ssoadmin_instance_access_control_attributes" "this" {
+  instance_arn = local.sso_instance_arn
+
+  attribute {
+    key = "userName"
+    value {
+      source = ["$${user:name}"]
+    }
+  }
 }
 
 # ─── Permission Set ────────────────────────────────────────────────────────────
@@ -44,7 +56,7 @@ resource "aws_identitystore_user" "student" {
   identity_store_id = local.sso_identity_store_id
 
   user_name    = each.value.username
-  display_name = "${each.value.given_name} ${each.value.family_name}"
+  display_name = each.value.username
 
   name {
     given_name  = each.value.given_name
