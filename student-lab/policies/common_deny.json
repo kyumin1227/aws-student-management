@@ -20,11 +20,39 @@
       "Condition": {
         "StringLike": {
           "ec2:InstanceType": [
-            "p2.*", "p3.*", "p4d.*", "p5.*",
-            "g3.*", "g4dn.*", "g4ad.*", "g5.*", "g5g.*",
-            "x1.*", "x2.*", "u-*",
-            "trn1.*", "inf1.*", "inf2.*"
+            "p2.*",
+            "p3.*",
+            "p4d.*",
+            "p5.*",
+            "g3.*",
+            "g4dn.*",
+            "g4ad.*",
+            "g5.*",
+            "g5g.*",
+            "x1.*",
+            "x2.*",
+            "u-*",
+            "trn1.*",
+            "inf1.*",
+            "inf2.*"
           ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyAuroraCluster",
+      "Effect": "Deny",
+      "Action": "rds:CreateDBCluster",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyExpensiveRDSInstanceTypes",
+      "Effect": "Deny",
+      "Action": ["rds:CreateDBInstance", "rds:ModifyDBInstance"],
+      "Resource": "*",
+      "Condition": {
+        "StringLike": {
+          "rds:DatabaseClass": ["db.m*.*", "db.r*.*", "db.x*.*", "db.z*.*", "db.p*.*"]
         }
       }
     }
