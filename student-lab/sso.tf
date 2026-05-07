@@ -34,12 +34,39 @@ resource "aws_ssoadmin_permission_set" "student" {
   description      = "Student lab access permission set"
 }
 
-resource "aws_ssoadmin_customer_managed_policy_attachment" "student_tag_enforce" {
+resource "aws_ssoadmin_customer_managed_policy_attachment" "student_ec2" {
   instance_arn       = local.sso_instance_arn
   permission_set_arn = aws_ssoadmin_permission_set.student.arn
 
   customer_managed_policy_reference {
-    name = aws_iam_policy.student_tag_enforce.name
+    name = aws_iam_policy.student_ec2.name
+  }
+}
+
+resource "aws_ssoadmin_customer_managed_policy_attachment" "student_s3" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student.arn
+
+  customer_managed_policy_reference {
+    name = aws_iam_policy.student_s3.name
+  }
+}
+
+resource "aws_ssoadmin_customer_managed_policy_attachment" "student_rds" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student.arn
+
+  customer_managed_policy_reference {
+    name = aws_iam_policy.student_rds.name
+  }
+}
+
+resource "aws_ssoadmin_customer_managed_policy_attachment" "student_deny" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student.arn
+
+  customer_managed_policy_reference {
+    name = aws_iam_policy.student_deny.name
   }
 }
 
