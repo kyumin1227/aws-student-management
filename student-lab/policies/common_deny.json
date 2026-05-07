@@ -1,0 +1,32 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyOtherRegions",
+      "Effect": "Deny",
+      "NotAction": ["iam:*", "sts:*", "route53:*", "budgets:*", "account:*", "support:*"],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": "ap-northeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "DenyExpensiveInstanceTypes",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringLike": {
+          "ec2:InstanceType": [
+            "p2.*", "p3.*", "p4d.*", "p5.*",
+            "g3.*", "g4dn.*", "g4ad.*", "g5.*", "g5g.*",
+            "x1.*", "x2.*", "u-*",
+            "trn1.*", "inf1.*", "inf2.*"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowEC2ReadOnly",
+      "Effect": "Allow",
+      "Action": ["ec2:Describe*", "ec2:Get*", "ec2:List*"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowEC2RunInstancesSharedResources",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": [
+        "arn:aws:ec2:*:*:subnet/*",
+        "arn:aws:ec2:*:*:network-interface/*",
+        "arn:aws:ec2:*:*:security-group/*",
+        "arn:aws:ec2:*:*:volume/*",
+        "arn:aws:ec2:*:*:key-pair/*",
+        "arn:aws:ec2:*::image/*"
+      ]
+    },
+    {
+      "Sid": "AllowEC2RunInstancesOwnOnly",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Owner": "${aws:PrincipalTag/userName}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowEC2ManageOwn",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:StartInstances",
+        "ec2:StopInstances",
+        "ec2:TerminateInstances",
+        "ec2:RebootInstances",
+        "ec2:ModifyInstanceAttribute"
+      ],
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Owner": "${aws:PrincipalTag/userName}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowCreateTagsOnLaunch",
+      "Effect": "Allow",
+      "Action": "ec2:CreateTags",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:CreateAction": ["RunInstances"]
+        }
+      }
+    },
+    {
+      "Sid": "AllowKeyPairs",
+      "Effect": "Allow",
+      "Action": ["ec2:CreateKeyPair", "ec2:DeleteKeyPair", "ec2:ImportKeyPair"],
+      "Resource": "arn:aws:ec2:*:*:key-pair/*"
+    },
+    {
+      "Sid": "AllowSecurityGroupCreate",
+      "Effect": "Allow",
+      "Action": "ec2:CreateSecurityGroup",
+      "Resource": ["arn:aws:ec2:*:*:security-group/*", "arn:aws:ec2:*:*:vpc/*"]
+    },
+    {
+      "Sid": "AllowSecurityGroupManageOwn",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:AuthorizeSecurityGroupEgress",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupEgress",
+        "ec2:DeleteSecurityGroup",
+        "ec2:UpdateSecurityGroupRuleDescriptionsIngress",
+        "ec2:UpdateSecurityGroupRuleDescriptionsEgress"
+      ],
+      "Resource": "arn:aws:ec2:*:*:security-group/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Owner": "${aws:PrincipalTag/userName}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowConsoleNavigation",
+      "Effect": "Allow",
+      "Action": ["sts:GetCallerIdentity", "iam:GetUser", "iam:ListAccountAliases"],
+      "Resource": "*"
+    }
+  ]
+}

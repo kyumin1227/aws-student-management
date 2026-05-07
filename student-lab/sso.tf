@@ -34,12 +34,6 @@ resource "aws_ssoadmin_permission_set" "student" {
   description      = "Student lab access permission set"
 }
 
-resource "aws_ssoadmin_managed_policy_attachment" "student_poweruser" {
-  instance_arn       = local.sso_instance_arn
-  permission_set_arn = aws_ssoadmin_permission_set.student.arn
-  managed_policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
-}
-
 resource "aws_ssoadmin_customer_managed_policy_attachment" "student_tag_enforce" {
   instance_arn       = local.sso_instance_arn
   permission_set_arn = aws_ssoadmin_permission_set.student.arn
