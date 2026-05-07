@@ -1,6 +1,7 @@
 data "aws_iam_policy_document" "student_merged" {
   source_policy_documents = [
     file("${path.module}/policies/ec2.json"),
+    file("${path.module}/policies/s3.json"),
     file("${path.module}/policies/common_deny.json"),
   ]
 }
