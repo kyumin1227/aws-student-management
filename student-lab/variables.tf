@@ -7,11 +7,12 @@ variable "aws_region" {
 variable "students" {
   description = "학생 목록. username은 Identity Center 로그인 ID 및 Owner 태그 값으로 사용"
   type = list(object({
-    username    = string
-    given_name  = string
-    family_name = string
-    email       = optional(string, "")
-    budget      = optional(number, null)
+    username     = string
+    display_name = string
+    given_name   = string
+    family_name  = string
+    email        = optional(string, "")
+    budget       = optional(number, null)
   }))
 }
 

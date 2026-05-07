@@ -1,0 +1,63 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyOtherRegions",
+      "Effect": "Deny",
+      "NotAction": ["iam:*", "sts:*", "route53:*", "budgets:*", "account:*", "support:*"],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": "ap-northeast-2"
+        }
+      }
+    },
+    {
+      "Sid": "DenyExpensiveInstanceTypes",
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringLike": {
+          "ec2:InstanceType": [
+            "c*.*",
+            "m*.*",
+            "r*.*",
+            "i*.*",
+            "d*.*",
+            "h*.*",
+            "z*.*",
+            "f*.*",
+            "p*.*",
+            "g*.*",
+            "x*.*",
+            "u-*",
+            "vt*.*",
+            "dl*.*",
+            "hpc*.*",
+            "mac*.*",
+            "trn*.*",
+            "inf*.*"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyAuroraCluster",
+      "Effect": "Deny",
+      "Action": "rds:CreateDBCluster",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyExpensiveRDSInstanceTypes",
+      "Effect": "Deny",
+      "Action": ["rds:CreateDBInstance", "rds:ModifyDBInstance"],
+      "Resource": "*",
+      "Condition": {
+        "StringLike": {
+          "rds:DatabaseClass": ["db.m*.*", "db.r*.*", "db.x*.*", "db.z*.*", "db.p*.*"]
+        }
+      }
+    }
+  ]
+}

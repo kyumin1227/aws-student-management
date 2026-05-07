@@ -1,24 +1,14 @@
-# 학생 이름 목록 (IAM username 및 Owner 태그 값으로 사용)
+# 학생 목록
+# - username: Identity Center 로그인 ID (대소문자 혼용 가능, 고유해야 함)
+# - display_name: ABAC 태그 및 S3 버킷 prefix로 사용 (소문자, 공백 금지, 하이픈만 사용, 고유해야 함)
+# - given_name / family_name: 실명
+# - email: 선택 (미입력 시 username@student.local 사용)
+# - budget: 선택 (미입력 시 기본값 사용)
 students = [
-  "alice", "bob", "carol", "dave",
-  "eve", "frank", "grace", "henry",
-  "iris", "jack", "kate", "liam"
+  { username = "AliceSmith",  display_name = "alice-smith",  given_name = "Alice",  family_name = "Smith",  email = "alice@example.com",  budget = 10 },
+  { username = "BobJohnson",  display_name = "bob-johnson",  given_name = "Bob",    family_name = "Johnson", email = "bob@example.com",   budget = 10 },
+  { username = "CarolWilson", display_name = "carol-wilson", given_name = "Carol",  family_name = "Wilson", email = "carol@example.com",  budget = 10 },
 ]
 
-# 강사 이메일 (50%/80%/100% 알림 수신)
+# 관리자 이메일 (50%/80%/100% 알림 수신)
 lab_admin_email = "instructor@example.com"
-
-# 학생별 예산 한도 (기본값: $40, 변경 필요한 학생만 작성)
-# student_budget_limits = {
-#   "alice" = 60
-#   "bob"   = 20
-# }
-
-# 킬 스위치 발동 시 학생 이메일 알림 (설정하지 않으면 알림 비활성화)
-# student_emails = {
-#   "alice" = "alice@example.com"
-#   "bob"   = "bob@example.com"
-# }
-
-# SES 발신자 이메일 (student_emails 설정 시 필수, SES에서 인증된 이메일이어야 함)
-# ses_sender_email = "lab-admin@example.com"

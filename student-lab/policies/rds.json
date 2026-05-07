@@ -1,0 +1,97 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowRDSReadOnly",
+      "Effect": "Allow",
+      "Action": ["rds:Describe*", "rds:ListTagsForResource"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "AllowRDSCreateOwnOnly",
+      "Effect": "Allow",
+      "Action": "rds:CreateDBInstance",
+      "Resource": "arn:aws:rds:*:*:db:*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Owner": "${aws:PrincipalTag/userName}"
+        },
+        "StringLike": {
+          "rds:DatabaseClass": ["db.t3.micro", "db.t4g.micro"]
+        }
+      }
+    },
+    {
+      "Sid": "AllowRDSCreateSharedResources",
+      "Effect": "Allow",
+      "Action": "rds:CreateDBInstance",
+      "Resource": ["arn:aws:rds:*:*:subgrp:*", "arn:aws:rds:*:*:pg:*", "arn:aws:rds:*:*:og:*"]
+    },
+    {
+      "Sid": "AllowRDSManageOwn",
+      "Effect": "Allow",
+      "Action": [
+        "rds:StartDBInstance",
+        "rds:StopDBInstance",
+        "rds:RebootDBInstance",
+        "rds:DeleteDBInstance",
+        "rds:AddTagsToResource",
+        "rds:RemoveTagsFromResource"
+      ],
+      "Resource": "arn:aws:rds:*:*:db:*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Owner": "${aws:PrincipalTag/userName}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowRDSModifyOwn",
+      "Effect": "Allow",
+      "Action": "rds:ModifyDBInstance",
+      "Resource": "arn:aws:rds:*:*:db:*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Owner": "${aws:PrincipalTag/userName}"
+        },
+        "StringLike": {
+          "rds:DatabaseClass": ["db.t3.micro", "db.t4g.micro"]
+        }
+      }
+    },
+    {
+      "Sid": "AllowRDSSnapshotCreateFromOwnDB",
+      "Effect": "Allow",
+      "Action": "rds:CreateDBSnapshot",
+      "Resource": "arn:aws:rds:*:*:db:*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Owner": "${aws:PrincipalTag/userName}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowRDSSnapshotTarget",
+      "Effect": "Allow",
+      "Action": ["rds:CreateDBSnapshot", "rds:DeleteDBSnapshot", "rds:CopyDBSnapshot"],
+      "Resource": "arn:aws:rds:*:*:snapshot:*"
+    },
+    {
+      "Sid": "AllowRDSRestoreFromSnapshot",
+      "Effect": "Allow",
+      "Action": "rds:RestoreDBInstanceFromDBSnapshot",
+      "Resource": ["arn:aws:rds:*:*:db:*", "arn:aws:rds:*:*:snapshot:*"]
+    },
+    {
+      "Sid": "AllowRDSCreateTagsOnCreate",
+      "Effect": "Allow",
+      "Action": "rds:AddTagsToResource",
+      "Resource": "arn:aws:rds:*:*:db:*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Owner": "${aws:PrincipalTag/userName}"
+        }
+      }
+    }
+  ]
+}

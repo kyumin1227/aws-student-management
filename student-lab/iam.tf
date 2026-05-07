@@ -1,6 +1,14 @@
-# 태그 강제 IAM 정책 (생성 시 Owner 필수 + 생성 후 제거 차단 + 고비용 리소스 차단)
+data "aws_iam_policy_document" "student_merged" {
+  source_policy_documents = [
+    file("${path.module}/policies/ec2.json"),
+    file("${path.module}/policies/s3.json"),
+    file("${path.module}/policies/rds.json"),
+    file("${path.module}/policies/common_deny.json"),
+  ]
+}
+
 resource "aws_iam_policy" "student_tag_enforce" {
   name        = "StudentTagEnforcePolicy"
   description = "학생 IAM 사용자: Owner 태그 강제 + 고비용 리소스 차단"
-  policy      = file("${path.module}/policies/student_tag_enforce.json")
+  policy      = data.aws_iam_policy_document.student_merged.json
 }
