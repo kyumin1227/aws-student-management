@@ -55,7 +55,29 @@
       "Resource": "*",
       "Condition": {
         "StringEquals": {
-          "ec2:CreateAction": ["RunInstances"]
+          "ec2:CreateAction": ["RunInstances", "AllocateAddress"]
+        }
+      }
+    },
+    {
+      "Sid": "AllowEIPAllocateOwnOnly",
+      "Effect": "Allow",
+      "Action": "ec2:AllocateAddress",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestTag/Owner": "${aws:PrincipalTag/userName}"
+        }
+      }
+    },
+    {
+      "Sid": "AllowEIPManageOwn",
+      "Effect": "Allow",
+      "Action": ["ec2:ReleaseAddress", "ec2:AssociateAddress", "ec2:DisassociateAddress"],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/Owner": "${aws:PrincipalTag/userName}"
         }
       }
     },
