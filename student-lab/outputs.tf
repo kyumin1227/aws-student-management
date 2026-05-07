@@ -1,6 +1,6 @@
 output "sso_portal_url" {
   description = "학생 SSO 로그인 포털 URL"
-  value       = "https://d-${local.sso_identity_store_id}.awsapps.com/start"
+  value       = "https://${local.sso_identity_store_id}.awsapps.com/start"
 }
 
 output "student_usernames" {
