@@ -50,7 +50,7 @@ resource "aws_identitystore_user" "student" {
   identity_store_id = local.sso_identity_store_id
 
   user_name    = each.value.username
-  display_name = each.value.username
+  display_name = each.value.display_name
 
   name {
     given_name  = each.value.given_name
