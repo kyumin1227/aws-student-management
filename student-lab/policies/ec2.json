@@ -110,6 +110,12 @@
       "Resource": ["arn:aws:ec2:*:*:security-group/*", "arn:aws:ec2:*:*:vpc/*"]
     },
     {
+      "Sid": "AllowSecurityGroupAssignToInstance",
+      "Effect": "Allow",
+      "Action": "ec2:ModifyInstanceAttribute",
+      "Resource": "arn:aws:ec2:*:*:security-group/*"
+    },
+    {
       "Sid": "AllowSecurityGroupManageOwn",
       "Effect": "Allow",
       "Action": [
@@ -123,7 +129,7 @@
       ],
       "Resource": "arn:aws:ec2:*:*:security-group/*",
       "Condition": {
-        "StringEquals": {
+        "StringEqualsIfExists": {
           "aws:ResourceTag/Owner": "${aws:PrincipalTag/userName}"
         }
       }
