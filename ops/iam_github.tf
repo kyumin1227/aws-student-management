@@ -122,7 +122,8 @@ resource "aws_iam_role_policy" "github_monitoring_iam" {
           "iam:DeleteInstanceProfile",
           "iam:GetInstanceProfile",
           "iam:AddRoleToInstanceProfile",
-          "iam:RemoveRoleFromInstanceProfile"
+          "iam:RemoveRoleFromInstanceProfile",
+          "iam:TagInstanceProfile"
         ]
         Resource = "arn:aws:iam::045861054142:instance-profile/bannote-prod-monitoring-*"
       }
