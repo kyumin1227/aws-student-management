@@ -45,9 +45,9 @@ resource "aws_iam_role_policy_attachment" "github_poweruser" {
   policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
 }
 
-# PassRole 범위 제한 — ECS tasks 서비스 전달 용도 외 Deny
+# PassRole 범위 제한 — ECS tasks / 모니터링 EC2 전달 용도 외 Deny
 #
-# PowerUserAccess는 iam:PassRole을 포함하므로, Deny로 범위를 좁힘.
+# PowerUserAccess는 iam:PassRole을 포함하므로, Allow로 범위를 명시.
 # 검증 방법:
 #   aws iam simulate-principal-policy \
 #     --policy-source-arn <github_actions_role_arn> \
@@ -60,14 +60,72 @@ resource "aws_iam_role_policy" "github_passrole" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Sid    = "AllowPassRoleToECSOnly"
-      Effect = "Allow"
-      Action = "iam:PassRole"
-      Resource = concat(
-        [for r in aws_iam_role.ecs_task : r.arn],
-        [for r in aws_iam_role.ecs_execution : r.arn],
-      )
-    }]
+    Statement = [
+      {
+        Sid    = "AllowPassRoleToECSOnly"
+        Effect = "Allow"
+        Action = "iam:PassRole"
+        Resource = concat(
+          [for r in aws_iam_role.ecs_task : r.arn],
+          [for r in aws_iam_role.ecs_execution : r.arn],
+        )
+      },
+      {
+        Sid      = "AllowPassRoleToMonitoringEC2"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
+        Resource = "arn:aws:iam::045861054142:role/bannote-prod-monitoring-*"
+        Condition = {
+          StringEquals = {
+            "iam:PassedToService" = "ec2.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# 모니터링 EC2용 IAM Role / Instance Profile 관리 권한
+#
+# PowerUserAccess에는 IAM 리소스 생성 권한이 없으므로,
+# bannote-prod-monitoring-* 네임스페이스로 범위를 제한하여 별도 허용.
+resource "aws_iam_role_policy" "github_monitoring_iam" {
+  name = "monitoring-ec2-iam-management"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "MonitoringRoleManagement"
+        Effect = "Allow"
+        Action = [
+          "iam:CreateRole",
+          "iam:DeleteRole",
+          "iam:GetRole",
+          "iam:AttachRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:GetRolePolicy",
+          "iam:TagRole",
+          "iam:ListAttachedRolePolicies",
+          "iam:ListRolePolicies"
+        ]
+        Resource = "arn:aws:iam::045861054142:role/bannote-prod-monitoring-*"
+      },
+      {
+        Sid    = "MonitoringInstanceProfileManagement"
+        Effect = "Allow"
+        Action = [
+          "iam:CreateInstanceProfile",
+          "iam:DeleteInstanceProfile",
+          "iam:GetInstanceProfile",
+          "iam:AddRoleToInstanceProfile",
+          "iam:RemoveRoleFromInstanceProfile"
+        ]
+        Resource = "arn:aws:iam::045861054142:instance-profile/bannote-prod-monitoring-*"
+      }
+    ]
   })
 }
