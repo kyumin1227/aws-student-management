@@ -21,3 +21,9 @@ resource "aws_iam_policy" "student_deny" {
   description = "학생 고비용 리소스 차단 및 리전 제한"
   policy      = file("${path.module}/policies/common_deny.json")
 }
+
+resource "aws_iam_policy" "billing_deny" {
+  name        = "BillingDenyPolicy"
+  description = "Billing and cost data access deny"
+  policy      = file("${path.module}/policies/billing_deny.json")
+}
