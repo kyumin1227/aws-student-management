@@ -12,6 +12,12 @@ data "aws_ssoadmin_instances" "this" {}
 locals {
   sso_instance_arn      = tolist(data.aws_ssoadmin_instances.this.arns)[0]
   sso_identity_store_id = tolist(data.aws_ssoadmin_instances.this.identity_store_ids)[0]
+
+  student_permission_set_arn = (
+    var.student_lab_mode == "admin" ? aws_ssoadmin_permission_set.student_admin.arn :
+    var.student_lab_mode == "poweruser" ? aws_ssoadmin_permission_set.student_poweruser.arn :
+    aws_ssoadmin_permission_set.student.arn
+  )
 }
 
 resource "aws_ssoadmin_instance_access_control_attributes" "this" {
@@ -110,11 +116,50 @@ resource "aws_identitystore_group_membership" "student" {
 
 resource "aws_ssoadmin_account_assignment" "students" {
   instance_arn       = local.sso_instance_arn
-  permission_set_arn = aws_ssoadmin_permission_set.student.arn
+  permission_set_arn = local.student_permission_set_arn
 
   principal_id   = aws_identitystore_group.students.group_id
   principal_type = "GROUP"
 
   target_id   = data.aws_caller_identity.current.account_id
   target_type = "AWS_ACCOUNT"
+}
+
+# ─── StudentPowerUserAccess ────────────────────────────────────────────────────
+
+resource "aws_ssoadmin_permission_set" "student_poweruser" {
+  name             = "StudentPowerUserAccess"
+  instance_arn     = local.sso_instance_arn
+  session_duration = "PT8H"
+  description      = "Student VPC/Lambda/CloudWatch lab access (no IAM, cost control)"
+}
+
+resource "aws_ssoadmin_managed_policy_attachment" "student_poweruser" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student_poweruser.arn
+  managed_policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
+}
+
+resource "aws_ssoadmin_customer_managed_policy_attachment" "student_poweruser_deny" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student_poweruser.arn
+
+  customer_managed_policy_reference {
+    name = aws_iam_policy.student_deny.name
+  }
+}
+
+# ─── StudentAdminAccess ────────────────────────────────────────────────────────
+
+resource "aws_ssoadmin_permission_set" "student_admin" {
+  name             = "StudentAdminAccess"
+  instance_arn     = local.sso_instance_arn
+  session_duration = "PT8H"
+  description      = "Student full admin access for IAM labs"
+}
+
+resource "aws_ssoadmin_managed_policy_attachment" "student_admin" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student_admin.arn
+  managed_policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }

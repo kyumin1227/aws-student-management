@@ -16,3 +16,6 @@ students = [
 
 # 강사 이메일 (50%/80%/100% 알림 수신)
 lab_admin_email = "kyumin12271227@gmail.com"
+
+# 학생 실습 권한 모드: restricted | poweruser | admin
+student_lab_mode = "poweruser"

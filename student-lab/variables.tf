@@ -33,3 +33,18 @@ variable "lab_admin_email" {
   type        = string
   default     = ""
 }
+
+variable "student_lab_mode" {
+  description = <<-EOT
+    학생 실습 권한 모드
+      restricted : 기본 제한 모드 (EC2/S3/RDS ABAC, 비용 제어)
+      poweruser  : VPC·Lambda·CloudWatch 실습 (비용 제어 유지, IAM 제외)
+      admin      : IAM 실습 (AdministratorAccess, 제한 없음)
+  EOT
+  type        = string
+  default     = "restricted"
+  validation {
+    condition     = contains(["restricted", "poweruser", "admin"], var.student_lab_mode)
+    error_message = "student_lab_mode은 restricted, poweruser, admin 중 하나여야 합니다."
+  }
+}
