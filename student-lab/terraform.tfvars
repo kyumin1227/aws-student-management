@@ -11,6 +11,7 @@ students = [
   { username = "SeongbinYoon", display_name = "seongbin-yoon", given_name = "Seongbin", family_name = "Yoon", email = "gsc2423020@g.yju.ac.kr", budget = 30 },
   { username = "HyochanKim", display_name = "hyochan-kim", given_name = "Hyochan", family_name = "Kim", email = "skkhc0317@g.yju.ac.kr", budget = 30 },
   { username = "HyukilKwon", display_name = "hyukil-kwon", given_name = "Hyukil", family_name = "Kwon", email = "gurdlf320@g.yju.ac.kr", budget = 30 },
+  { username = "ShinwooLee", display_name = "shinwoo-lee", given_name = "Shinwoo", family_name = "Lee", email = "tlsdn0625@g.yju.ac.kr", budget = 30 },
 ]
 
 # 강사 이메일 (50%/80%/100% 알림 수신)
