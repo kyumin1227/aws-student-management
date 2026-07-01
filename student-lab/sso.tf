@@ -12,12 +12,6 @@ data "aws_ssoadmin_instances" "this" {}
 locals {
   sso_instance_arn      = tolist(data.aws_ssoadmin_instances.this.arns)[0]
   sso_identity_store_id = tolist(data.aws_ssoadmin_instances.this.identity_store_ids)[0]
-
-  student_permission_set_arn = (
-    var.student_lab_mode == "admin" ? aws_ssoadmin_permission_set.student_admin.arn :
-    var.student_lab_mode == "poweruser" ? aws_ssoadmin_permission_set.student_poweruser.arn :
-    aws_ssoadmin_permission_set.student.arn
-  )
 }
 
 resource "aws_ssoadmin_instance_access_control_attributes" "this" {
@@ -116,7 +110,31 @@ resource "aws_identitystore_group_membership" "student" {
 
 resource "aws_ssoadmin_account_assignment" "students" {
   instance_arn       = local.sso_instance_arn
-  permission_set_arn = local.student_permission_set_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student.arn
+
+  principal_id   = aws_identitystore_group.students.group_id
+  principal_type = "GROUP"
+
+  target_id   = data.aws_caller_identity.current.account_id
+  target_type = "AWS_ACCOUNT"
+}
+
+resource "aws_ssoadmin_account_assignment" "students_poweruser" {
+  count              = contains(["poweruser", "admin"], var.student_lab_mode) ? 1 : 0
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student_poweruser.arn
+
+  principal_id   = aws_identitystore_group.students.group_id
+  principal_type = "GROUP"
+
+  target_id   = data.aws_caller_identity.current.account_id
+  target_type = "AWS_ACCOUNT"
+}
+
+resource "aws_ssoadmin_account_assignment" "students_admin" {
+  count              = var.student_lab_mode == "admin" ? 1 : 0
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student_admin.arn
 
   principal_id   = aws_identitystore_group.students.group_id
   principal_type = "GROUP"
