@@ -70,6 +70,15 @@ resource "aws_ssoadmin_customer_managed_policy_attachment" "student_deny" {
   }
 }
 
+resource "aws_ssoadmin_customer_managed_policy_attachment" "student_billing_deny" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student.arn
+
+  customer_managed_policy_reference {
+    name = aws_iam_policy.billing_deny.name
+  }
+}
+
 # ─── Identity Center 유저 ──────────────────────────────────────────────────────
 
 resource "aws_identitystore_user" "student" {
@@ -164,6 +173,15 @@ resource "aws_ssoadmin_customer_managed_policy_attachment" "student_poweruser_de
 
   customer_managed_policy_reference {
     name = aws_iam_policy.student_deny.name
+  }
+}
+
+resource "aws_ssoadmin_customer_managed_policy_attachment" "student_poweruser_billing_deny" {
+  instance_arn       = local.sso_instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.student_poweruser.arn
+
+  customer_managed_policy_reference {
+    name = aws_iam_policy.billing_deny.name
   }
 }
 

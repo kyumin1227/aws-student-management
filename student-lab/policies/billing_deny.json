@@ -10,7 +10,12 @@
         "ce:*",
         "cur:*",
         "purchase-orders:*",
-        "savingsplans:*"
+        "savingsplans:*",
+        "payments:*",
+        "invoicing:*",
+        "tax:*",
+        "consolidatedbilling:*",
+        "freetier:*"
       ],
       "Resource": "*"
     }
