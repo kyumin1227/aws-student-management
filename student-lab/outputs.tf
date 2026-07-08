@@ -27,3 +27,8 @@ output "dlq_url" {
   description = "Lambda DLQ URL (파싱 실패 메시지 모니터링용)"
   value       = aws_sqs_queue.lambda_dlq.url
 }
+
+output "nightly_shutdown_function_name" {
+  description = "야간 자동 중지 Lambda 함수 이름"
+  value       = aws_lambda_function.nightly_shutdown.function_name
+}
