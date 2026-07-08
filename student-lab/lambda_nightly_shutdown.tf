@@ -1,5 +1,5 @@
-# 매일 18:00(KST)에 실행 중인 EC2/RDS를 자동 중지.
-# Environment=production 태그가 붙은 리소스는 예외 처리.
+# 매일 18:00(KST)에 모든 리전의 실행 중인 EC2/RDS를 자동 중지.
+# Environment=production 또는 prod 태그가 붙은 리소스는 예외 처리.
 
 locals {
   nightly_shutdown_zip_path = "${path.module}/lambda/nightly_shutdown.zip"
@@ -47,6 +47,7 @@ resource "aws_iam_role_policy" "lambda_nightly_shutdown" {
       {
         Effect = "Allow"
         Action = [
+          "ec2:DescribeRegions",
           "ec2:DescribeInstances",
           "ec2:StopInstances"
         ]
@@ -72,7 +73,7 @@ resource "aws_lambda_function" "nightly_shutdown" {
   role          = aws_iam_role.lambda_nightly_shutdown.arn
   handler       = "index.lambda_handler"
   runtime       = "python3.12"
-  timeout       = 60
+  timeout       = 300
   memory_size   = 256
 
   filename         = local.nightly_shutdown_zip_path
