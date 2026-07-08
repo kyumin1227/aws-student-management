@@ -1,7 +1,7 @@
 """
 AWS Student Lab — Nightly Shutdown
 Lambda 함수: 매일 지정된 시각에 실행 중인 EC2/RDS를 자동 중지
-(Environment=production 태그가 붙은 리소스는 예외)
+(Environment=production 또는 prod 태그가 붙은 리소스는 예외)
 
 트리거: EventBridge Scheduler (cron)
 런타임: Python 3.12
@@ -20,7 +20,7 @@ ec2 = boto3.client("ec2")
 rds = boto3.client("rds")
 
 PRODUCTION_TAG_KEY = "Environment"
-PRODUCTION_TAG_VALUE = "production"
+PRODUCTION_TAG_VALUES = {"production", "prod"}
 
 
 # ─── EC2 ───────────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ def stop_non_production_ec2_instances() -> list[str]:
     for reservation in response["Reservations"]:
         for instance in reservation["Instances"]:
             tags = {t["Key"]: t["Value"] for t in instance.get("Tags", [])}
-            if tags.get(PRODUCTION_TAG_KEY) == PRODUCTION_TAG_VALUE:
+            if tags.get(PRODUCTION_TAG_KEY) in PRODUCTION_TAG_VALUES:
                 continue
             target_ids.append(instance["InstanceId"])
 
@@ -81,7 +81,7 @@ def stop_non_production_rds_instances() -> list[str]:
             logger.warning(f"RDS 태그 조회 실패 ({db_id}): {e}")
             continue
 
-        if tags.get(PRODUCTION_TAG_KEY) == PRODUCTION_TAG_VALUE:
+        if tags.get(PRODUCTION_TAG_KEY) in PRODUCTION_TAG_VALUES:
             continue
 
         try:
